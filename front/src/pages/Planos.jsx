@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../components/button";
 import { Link } from "react-router-dom";
 import posterImages from "../constants/posterImages";
+import api from "../services/api";
 
 import { useDispatch } from "react-redux";
 import { selecionarPlano } from "../store/userSlice";
@@ -13,19 +14,21 @@ import { useNavigate } from "react-router-dom";
 export default function Planos() {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const user = useSelector(state => state.user);
 
-  const [planoSelecionado, setPlanoSelecionado] = useState(0);
+  const [planoSelecionado, setPlanoSelecionado] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [planos, setPlanos] = useState([]);
+
+
   
-
-
-  const dispatch = useDispatch();
 
   // const subscription = useSelector(state => state.subscription);
   //console.log("SUBSCRIPTION:", user.assinatura?.tipo_plano);
  
-  const planos = [
+  /* const planos = [
   {
     nome: "Básico",
     qualidade: "720p",
@@ -56,9 +59,46 @@ export default function Planos() {
     exclusivo: "Sim",
     gradiente: "from-blue-500 to-red-500"
   }
-];
+]; */
 
-const planoAtual = planos[planoSelecionado];
+  useEffect(() => {
+    carregarPlanos();
+  }, []);
+
+  async function carregarPlanos() {
+    try {
+      const response = await api.get("/planos");
+      setPlanos(response.data);
+
+      if (response.data.length > 0) {
+        setPlanoSelecionado(response.data[0]); // Seleciona o primeiro plano por padrão
+      }
+
+    } catch (e) {
+      alert("Erro ao carregar planos: " + (e?.message || e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function formatarPreco(preco) {
+    return Number(preco).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function simOuNao(valor) {
+    return valor ? "Sim" : "Não";
+  }
+
+  if (loading) {
+    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Carregando planos...</div>;
+  }
+
+  if (!planoSelecionado) {
+    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Nenhum plano disponível.</div>;
+  }
+
+
+// const planoAtual = planos[planoSelecionado];
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col items-center py-10 text-white">
@@ -67,7 +107,7 @@ const planoAtual = planos[planoSelecionado];
 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 
     
-    <p>Plano: {user.assinatura?.tipo_plano}</p>
+    {/* <p>Plano: {user.assinatura?.tipo_plano}</p> */}
 
 
   {/* IMAGENS */}
@@ -122,25 +162,26 @@ pointer-events-none
 
       <div className="grid grid-cols-3 gap-3 w-full  mb-10">
 
-        {planos.map((plano, index) => {
+        {planos.map((plano) => {
 
-          const selecionado = planoSelecionado === index;
+          const selecionado = planoSelecionado?._id === plano._id;
 
           return (
 
             <div
-              key={index}
+              key={plano._id}
               /* onClick={() => setPlanoSelecionado(index)} */
               onClick={() => {
-                setPlanoSelecionado(index);;
+                setPlanoSelecionado(plano);;
               }}
               className={`
                 p-4 sm:p-5 rounded-xl text-center cursor-pointer
                 transition duration-300 ease-in-out
                 hover:scale-100  hover:shadow-xl hover:-translate-y-1 
-                ${selecionado 
-                  ? `bg-gradient-to-br ${plano.gradiente} text-white shadow-lg scale-100 `
-                  : "border  border-gray-600 bg-black/40 text-gray-300"}
+                ${selecionado
+                ? "bg-blue-600 text-white shadow-lg"
+                : "border border-gray-600 bg-black/40 text-gray-300"}
+
               `}
             >
 
@@ -149,7 +190,7 @@ pointer-events-none
               </h3>
 
               <p className={`${selecionado ? "text-white/90" : "text-gray-400"}`}>
-                {plano.qualidade}
+                {plano.qualidade_video}
               </p>
 
             </div>
@@ -165,32 +206,32 @@ pointer-events-none
 
         <div className="flex justify-between border-b  pb-3 text-sm text-white">
           <span className="font-bold text-base">Preço mensal:</span>
-          <span className="font-extralight text-base">{planoAtual.preco}</span>
+          <span className="font-extralight text-base">{formatarPreco(planoSelecionado.preco)}</span>
         </div>
 
         <div className="flex justify-between border-b pb-3 text-sm text-white ">
           <span className="font-bold text-base">Qualidade de vídeo:</span>
-          <span className="font-extralight text-base">{planoAtual.qualidade}</span>
+          <span className="font-extralight text-base">{planoSelecionado.qualidade_video}</span>
         </div>
 
         <div className="flex justify-between border-b pb-3 text-sm text-white">
           <span className="font-bold text-base">Permite download:</span>
-          <span className="font-extralight text-base">{planoAtual.download}</span>
+          <span className="font-extralight text-base">{simOuNao(planoSelecionado.permite_download)}</span>
         </div>
 
         <div className="flex justify-between border-b pb-3 text-sm text-white">
           <span className="font-bold text-base">Telas simultâneas:</span>
-          <span className="font-extralight text-base">{planoAtual.telas}</span>
+          <span className="font-extralight text-base">{planoSelecionado.telas_simultaneas}</span>
         </div>
 
         <div className="flex justify-between border-b pb-3 text-sm text-white">
           <span className="font-bold text-base">Com anúncios:</span>
-          <span className="font-extralight text-base">{planoAtual.anuncios}</span>
+          <span className="font-extralight text-base">{simOuNao(planoSelecionado.tem_anuncios)}</span>
         </div>
 
         <div className="flex justify-between border-b pb-3 text-sm text-white">
           <span className="font-bold text-base">Acesso a conteúdo exclusivo:</span>
-          <span className="font-extralight text-base">{planoAtual.exclusivo}</span>
+          <span className="font-extralight text-base">{simOuNao(planoSelecionado.conteudo_exclusivo)}</span>
         </div>
 
       </div>
@@ -199,11 +240,12 @@ pointer-events-none
       
         <Button 
         onClick={() => {
-          // console.log("CLICOU");
-          // console.log("PLANO SELECIONADO:", planos[planoSelecionado]);
-
-          // dispatch(setPlan(planos[planoSelecionado]));
-          dispatch(selecionarPlano(planos[planoSelecionado].nome));
+          /* dispatch(selecionarPlano(planos[planoSelecionado].nome)); */
+          dispatch(selecionarPlano({
+            plano_id: planoSelecionado._id,
+            tipo_plano: planoSelecionado.nome,
+            limite_perfis: planoSelecionado.limite_perfis
+          }));
 
 
           navigate("/pagamento");

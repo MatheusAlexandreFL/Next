@@ -7,6 +7,7 @@ const fileUpload = require("express-fileupload");
 const ConteudoRoutes = require("../routes/ConteudoRoutes");
 const UsuarioRoutes = require("../routes/UsuarioRoutes");
 const AvaliacaoRoutes = require("../routes/AvaliacaoRoutes");
+const PlanoRoutes = require("../routes/PlanosRoutes");
 
 connectDB();
 
@@ -19,6 +20,7 @@ app.use(fileUpload());
 app.use(ConteudoRoutes);
 app.use(UsuarioRoutes);
 app.use(AvaliacaoRoutes);
+app.use(PlanoRoutes);
 
 const PORT = process.env.SERVER_PORT;
 const HOST = process.env.SERVER_HOST;

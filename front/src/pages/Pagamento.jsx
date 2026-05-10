@@ -76,12 +76,12 @@ export default function Pagamento() {
   async function handlePagamento(e) {
     e.preventDefault();
 
-    if (!user?.id) {
+    if (!user?.id && !user?.token) {
       alert("Usuário não encontrado. Faça o cadastro ou login novamente.");
       return;
     }
 
-    if (!user.assinatura?.tipo_plano) {
+    if (!user.assinatura?.plano_id) {
       alert("Selecione um plano antes de iniciar a assinatura.");
       return;
     }
@@ -110,8 +110,9 @@ export default function Pagamento() {
     try {
       await dispatch(
         atualizarPlano({
-          id: user.id,
-          tipo_plano: user.assinatura?.tipo_plano,
+         /*  id: user.id,
+          tipo_plano: user.assinatura?.tipo_plano, */
+          plano_id: user.assinatura?.plano_id,
           tipo_pagamento: "credito" 
         })
       ).unwrap();

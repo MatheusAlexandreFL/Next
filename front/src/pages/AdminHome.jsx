@@ -34,6 +34,9 @@ export default function AdminHome() {
           <p className="text-gray-400 mt-2">Gerencie o catálogo, episódios e conteúdos da plataforma.</p>
         </header>
 
+        
+
+
         {/* GRID DE BOTÕES/AÇÕES */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
@@ -45,6 +48,14 @@ export default function AdminHome() {
             <h3 className="text-xl font-bold mb-2">Novo Conteúdo</h3>
             <p className="text-sm text-gray-500">Cadastrar filmes ou séries inéditas no MongoDB.</p>
           </Link>
+
+          <Link to="/admin/planos" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-cyan-500/50 transition-all">
+          <div className="bg-cyan-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-600 transition-colors">
+            <IoListOutline className="text-2xl text-cyan-500 group-hover:text-white" />
+          </div>
+          <h3 className="text-xl font-bold mb-2">Gerenciar Planos</h3>
+          <p className="text-sm text-gray-500">Criar, editar e desativar planos da plataforma.</p>
+        </Link>
 
           {/* BOTÃO: LISTAR/ATUALIZAR (listarConteudos) */}
           <button onClick={handleRefreshList} className="text-left group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-purple-500/50 transition-all">

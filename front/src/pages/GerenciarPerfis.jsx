@@ -22,10 +22,14 @@ export default function GerenciarPerfis() {
     : [{ id: 1, nome: user.nome || "Matheus", avatar: PerfilFeminino }];
   
   
-  const LIMITES_POR_PLANO = { basico: 1, padrao: 2, premium: 4 };
+ /*  const LIMITES_POR_PLANO = { basico: 1, padrao: 2, premium: 4 };
   const planoAtual = user.assinatura?.tipo_plano?.toLowerCase() || "basico";
   const limiteDePerfis = LIMITES_POR_PLANO[planoAtual] || 1;
-  const podeAdicionarPerfil = limiteDePerfis > 1 && perfisAtuais.length < limiteDePerfis;
+  const podeAdicionarPerfil = limiteDePerfis > 1 && perfisAtuais.length < limiteDePerfis; */
+
+  const limiteDePerfis = user.assinatura?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
+  const podeAdicionarPerfil = perfisAtuais.length < limiteDePerfis;
+
 
 
   const abrirEdicao = (perfil) => {

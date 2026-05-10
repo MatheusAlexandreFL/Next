@@ -15,6 +15,7 @@ import AdminRemover from "./pages/adminRemover.jsx";
 import PerfilUser from "./pages/PerfilUser.jsx";
 import GerenciarPerfis from "./pages/GerenciarPerfis.jsx";
 import AdicionarPerfil from "./pages/AdicionarPerfil.jsx";
+import AdminPlanos from "./pages/AdminPlanos.jsx";
 import Serie from "./pages/Serie.jsx";
 import Filme from "./pages/Filme.jsx";
 
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin/planos" element={<AdminPlanos />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/planos" element={<Planos />} />
         <Route path="/pagamento" element={<Pagamento />} />

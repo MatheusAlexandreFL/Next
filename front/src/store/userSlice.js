@@ -1,13 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 
+
+
+
+
 // CADASTRO
 export const cadastrarUsuario = createAsyncThunk(
   "user/cadastrarUsuario",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post("/usuarios", userData);
-      return response.data.user;
+      return response.data;
     } catch (err) {
       console.error(err);
       return rejectWithValue(err.response?.data?.erro || "Erro ao cadastrar usuário");
@@ -48,7 +52,7 @@ export const atualizarUsuario = createAsyncThunk(
 );
 
 // ATUALIZAR PLANO
-export const atualizarPlano = createAsyncThunk(
+/* export const atualizarPlano = createAsyncThunk(
   "user/atualizarPlano",
   async ({ id, tipo_plano, tipo_pagamento }, { rejectWithValue }) => {
     try {
@@ -62,7 +66,24 @@ export const atualizarPlano = createAsyncThunk(
       return rejectWithValue(err.response?.data?.erro || "Erro ao atualizar assinatura");
     }
   }
+); */
+
+export const atualizarPlano = createAsyncThunk(
+  "user/atualizarPlano",
+  async ({ plano_id, tipo_pagamento }, { rejectWithValue }) => {  
+    try {
+      const response = await api.patch("/usuarios/assinatura", {
+        plano_id,
+        tipo_pagamento
+      });
+      return response.data.user; 
+    } catch (err) {
+      console.error(err);
+      return rejectWithValue(err.response?.data?.erro || "Erro ao atualizar assinatura");
+    }
+  }
 );
+
 
 // BUSCAR WISHLIST
 export const buscarWishlist = createAsyncThunk(
@@ -146,31 +167,34 @@ export const removerPerfil = createAsyncThunk(
 );
 
 
+const usuarioSalvo = sessionStorage.getItem("user");
+const parsedUser = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
 
 // STATE
 const initialState = {
-  id: null,
-  nome: "",
-  sobrenome: "",
-  email: "",
-  data_nascimento: null,
-  role: "",
-  lista_desejos: [],
-  
-  
-  perfis: [],
-  perfilAtivo: null, 
-  assinatura: {
-     tipo_plano: null,
-     tipo_pagamento: null,
-     status: "inativo"
+  id: parsedUser?.id || null,
+  nome: parsedUser?.nome || "",
+  sobrenome: parsedUser?.sobrenome || "",
+  email: parsedUser?.email || "",
+  data_nascimento: parsedUser?.data_nascimento || null,
+  role: parsedUser?.role || "",
+  lista_desejos: parsedUser?.lista_desejos || [],
+  perfis: parsedUser?.perfis || [],
+  perfilAtivo: null,
+  assinatura: parsedUser?.assinatura || {
+    plano_id: null,
+    tipo_plano: null,
+    limite_perfis: 1,
+    tipo_pagamento: null,
+    status: "inativo"
   },
-  token: sessionStorage.getItem('token') || null,
-  isAuthenticated: !!sessionStorage.getItem('token'),
-
-  statusRequest: "idle", 
+  token: sessionStorage.getItem("token") || null,
+  isAuthenticated: !!sessionStorage.getItem("token"),
+  statusRequest: "idle",
   error: null
 };
+
 
 // SLICE
 const userSlice = createSlice({
@@ -180,12 +204,16 @@ const userSlice = createSlice({
     selecionarPlano: (state, action) => {
       if (!state.assinatura) {
         state.assinatura = {
+          plano_id: null,
           tipo_plano: null,
+          limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
         };
       }
-      state.assinatura.tipo_plano = action.payload;
+      state.assinatura.plano_id = action.payload.plano_id; // Limpa o plano_id para forçar a atualização completa na próxima assinatura
+      state.assinatura.tipo_plano = action.payload.tipo_plano;
+      state.assinatura.limite_perfis = action.payload.limite_perfis; // Atualiza o limite de perfis com base no plano selecionado
     },
     
 
@@ -204,14 +232,21 @@ const userSlice = createSlice({
       state.perfilAtivo = null;
 
       state.assinatura = {
+        plano_id: null,
         tipo_plano: null,
+        limite_perfis: 1,
         tipo_pagamento: null,
         status: "inativo"
+
       };
 
       state.statusRequest = "idle";
       state.error = null;
       state.isAuthenticated = false;
+      state.token = null;
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+
     }
   },
   extraReducers: (builder) => {
@@ -222,18 +257,33 @@ const userSlice = createSlice({
       })
       .addCase(cadastrarUsuario.fulfilled, (state, action) => {
         state.statusRequest = "succeeded";
-        state.id = action.payload._id;
-        state.nome = action.payload.nome;
-        state.sobrenome = action.payload.sobrenome;
-        state.email = action.payload.email;
-        state.data_nascimento = action.payload.data_nascimento;
-        state.role = action.payload.role;
-        state.perfis = action.payload.perfis || []; // Adicionado
-        
-        state.assinatura = action.payload.assinatura || {
+
+        const { token, usuario } = action.payload;
+
+        if(token) {
+          sessionStorage.setItem('token', action.payload.token);
+          state.token = token;
+        }
+
+        sessionStorage.setItem("user", JSON.stringify(usuario));
+
+
+
+        state.id = usuario?.id || null;
+        state.nome = usuario?.nome || "";
+        state.sobrenome = usuario?.sobrenome || "";
+        state.email = usuario?.email || "";
+        state.data_nascimento = usuario?.data_nascimento || null;
+        state.role = usuario?.role || "";
+        state.perfis = usuario?.perfis || [];
+
+        state.assinatura = usuario?.assinatura || {
+          plano_id: null,
           tipo_plano: null,
+          limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
+
         };
         state.isAuthenticated = true;
         state.error = null;
@@ -257,6 +307,9 @@ const userSlice = createSlice({
           state.token = token;
         }
 
+        sessionStorage.setItem("user", JSON.stringify(usuario));
+
+
         state.id = usuario?.id || null;
         state.nome = usuario?.nome || "";
         state.email = usuario?.email || "";
@@ -264,9 +317,12 @@ const userSlice = createSlice({
         state.perfis = usuario?.perfis || []; 
 
         state.assinatura = usuario?.assinatura || {
+          plano_id: null,
           tipo_plano: null,
+          limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
+
         };
         
         state.isAuthenticated = true;

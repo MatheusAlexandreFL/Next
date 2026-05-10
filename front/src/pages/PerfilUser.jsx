@@ -4,21 +4,39 @@ import { useDispatch } from "react-redux";
 import { atualizarPlano } from "../store/userSlice";
 import { atualizarUsuario } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
-
-const PLANOS = [
-  { id: "Básico", preco: "R$ 19,90", qualidade: "HD", telas: "1 tela" },
-  { id: "Padrão", preco: "R$ 39,90", qualidade: "Full HD", telas: "2 telas" },
-  { id: "Premium", preco: "R$ 54,90", qualidade: "4K + HDR", telas: "4 telas" }
-];
+import { useEffect } from "react";
+import api from "../services/api";
 
 export default function PerfilUser() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
+  
+const [planos, setPlanos] = useState([]);
+const [novoPlano, setNovoPlano] = useState(user.assinatura?.plano_id || "");
+const [loading, setLoading] = useState(false);
+
+useEffect(() => {
+  carregarPlanos();
+}, []);
+
+async function carregarPlanos() {
+  try {
+    const response = await api.get("/planos");
+    setPlanos(response.data);
+  } catch (e) {
+    console.error("Erro ao carregar planos:", e);
+  }
+}
+      
+
+
+
+
+
   const planoAtual = user.assinatura?.tipo_plano || "Nenhum plano selecionado";
-  const [novoPlano, setNovoPlano] = useState(planoAtual !== "Nenhum plano selecionado" ? planoAtual : "");
-  const [loading, setLoading] = useState(false);
+ 
  
 
   const [nome, setNome] = useState(user.nome || "");
@@ -36,9 +54,9 @@ export default function PerfilUser() {
 
       await dispatch(
         atualizarUsuario({
-          nome: nome.trim(),// Garante que o nome não tenha espaços extras
-          sobrenome: sobrenome.trim(), // Garante que o sobrenome não tenha espaços extras
-          data_nascimento: dataNascimento // Envia a data de nascimento no formato YYYY-MM-DD
+          nome: nome.trim(),
+          sobrenome: sobrenome.trim(),
+          data_nascimento: dataNascimento
         })
       ).unwrap();
 
@@ -61,7 +79,7 @@ export default function PerfilUser() {
       return;
     }
 
-    if (novoPlano === user.assinatura?.tipo_plano) {
+    if (novoPlano === user.assinatura?.plano_id) {
       alert("Você já está nesse plano.");
       return;
     }
@@ -71,9 +89,9 @@ export default function PerfilUser() {
 
       await dispatch(
         atualizarPlano({ 
-          id: user.id,
-          tipo_plano: novoPlano,
-          tipo_pagamento: "cartao" // ou "boleto", dependendo do que o usuário escolher
+          plano_id: novoPlano,
+          tipo_pagamento: user.assinatura?.tipo_pagamento || "cartao"
+
         })
       ).unwrap();
       
@@ -85,9 +103,8 @@ export default function PerfilUser() {
     }
   }
        
-         
+
      
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-black text-white px-6 py-10">
@@ -147,7 +164,7 @@ export default function PerfilUser() {
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <h2 className="text-xl font-medium mb-4">Alterar plano</h2>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          {/* <div className="grid gap-4 md:grid-cols-3">
             {PLANOS.map((plano) => {
               const ativo = novoPlano === plano.id;
               const isAtual = planoAtual === plano.id;
@@ -173,13 +190,50 @@ export default function PerfilUser() {
                 </button>
               );
             })}
-          </div>
+          </div> */}
+
+          <div className="grid gap-4 md:grid-cols-3">
+        {planos.map((plano) => {
+          const ativo = novoPlano === plano._id;
+          const isAtual = user.assinatura?.plano_id === plano._id;
+
+          return (
+            <button
+              key={plano._id}
+              onClick={() => setNovoPlano(plano._id)}
+              className={`text-left rounded-xl p-4 border transition ${
+                ativo
+                  ? "border-blue-400 bg-blue-500/20"
+                  : "border-white/15 bg-black/30 hover:border-white/30"
+              }`}
+            >
+              <p className="text-lg font-semibold">{plano.nome}</p>
+              <p className="text-sm text-gray-300">
+                {Number(plano.preco).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL"
+                })}/mês
+              </p>
+              <p className="text-sm text-gray-400 mt-2">
+                {plano.qualidade_video} • {plano.telas_simultaneas} telas
+              </p>
+
+              {isAtual && (
+                <span className="inline-block mt-3 text-xs px-2 py-1 rounded bg-emerald-600/30 border border-emerald-400/40">
+                  Plano atual
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
 
           <div className="mt-6 flex gap-3">
             <button
               onClick={handleAtualizarPlano}
               
-              disabled={!novoPlano || novoPlano === planoAtual}
+              disabled={!novoPlano || novoPlano === user.assinatura?.plano_id}
               
               className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
             >
