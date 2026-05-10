@@ -11,15 +11,16 @@ export default function Perfil() {
   const user = useSelector((state) => state.user);
 
   
-  const LIMITES_POR_PLANO = {
+  /* const LIMITES_POR_PLANO = {
     basico: 1,
     padrao: 2,
     premium: 4,
   };
 
-  
   const planoAtual = user.assinatura?.tipo_plano?.toLowerCase() || "basico";
-  const limiteDePerfis = LIMITES_POR_PLANO[planoAtual] || 1;
+  const limiteDePerfis = LIMITES_POR_PLANO[planoAtual] || 1; */
+
+  const limiteDePerfis = user.assinatura?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
 
  
   const perfisAtuais = user.perfis || [
@@ -27,7 +28,10 @@ export default function Perfil() {
   ];
 
   
-  const podeAdicionarPerfil = limiteDePerfis > 1 && perfisAtuais.length < limiteDePerfis;
+  /* const podeAdicionarPerfil = limiteDePerfis > 1 && perfisAtuais.length < limiteDePerfis; */
+
+  const podeAdicionarPerfil = perfisAtuais.length < limiteDePerfis;
+
 
   function handleSelectUser(perfilSelecionado) {
     dispatch(selecionarPerfilAtivo(perfilSelecionado));

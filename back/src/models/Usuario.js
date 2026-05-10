@@ -16,14 +16,27 @@ const UsuarioSchema = new mongoose.Schema({
     avatar: { type: String, required: true }
   }
 ],
-
-  assinatura: {
+  //assinatura antiga, para referência futura. A prática atual é criar um modelo separado para Assinatura, mas mantive esse campo aqui para facilitar a transição e evitar perda de dados durante o desenvolvimento
+  /* assinatura: {
     tipo_plano: String,     // Ex: "Premium", "Basic"
     tipo_pagamento: String, // Ex: "Credito", "Pix"
     status: { type: String, default: 'inativo' }, // Ex: "Ativo", "Pendente"
     data_inicio: Date,
     data_vencimento: Date
-  }
+  } */
+assinatura: {
+  plano_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Plano' }, // Referência ao plano contratado
+  tipo_plano: String,     // Ex: "Premium", "Basic" - para facilitar consultas rápidas, mesmo com a referência ao plano
+  limite_perfis: { type: Number, default: 1 },
+   // Limite de perfis permitido pelo plano, para controle interno
+  tipo_pagamento: String, // Ex: "Credito", "Pix"
+  status: { type: String, default: 'inativo' }, // Ex: "Ativo", "Pendente"
+  data_inicio: Date,
+  data_vencimento: Date
+}
+
+
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);
