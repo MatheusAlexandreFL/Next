@@ -68,7 +68,7 @@ export const atualizarUsuario = createAsyncThunk(
   }
 ); */
 
-export const atualizarPlano = createAsyncThunk(
+/* export const atualizarPlano = createAsyncThunk(
   "user/atualizarPlano",
   async ({ plano_id, tipo_pagamento }, { rejectWithValue }) => {  
     try {
@@ -82,7 +82,7 @@ export const atualizarPlano = createAsyncThunk(
       return rejectWithValue(err.response?.data?.erro || "Erro ao atualizar assinatura");
     }
   }
-);
+); */
 
 
 // BUSCAR WISHLIST
@@ -182,13 +182,13 @@ const initialState = {
   lista_desejos: parsedUser?.lista_desejos || [],
   perfis: parsedUser?.perfis || [],
   perfilAtivo: null,
-  assinatura: parsedUser?.assinatura || {
+  /* assinatura: parsedUser?.assinatura || {
     plano_id: null,
     tipo_plano: null,
     limite_perfis: 1,
     tipo_pagamento: null,
     status: "inativo"
-  },
+  }, */
   token: sessionStorage.getItem("token") || null,
   isAuthenticated: !!sessionStorage.getItem("token"),
   statusRequest: "idle",
@@ -201,7 +201,7 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    selecionarPlano: (state, action) => {
+    /* selecionarPlano: (state, action) => {
       if (!state.assinatura) {
         state.assinatura = {
           plano_id: null,
@@ -214,7 +214,7 @@ const userSlice = createSlice({
       state.assinatura.plano_id = action.payload.plano_id; // Limpa o plano_id para forçar a atualização completa na próxima assinatura
       state.assinatura.tipo_plano = action.payload.tipo_plano;
       state.assinatura.limite_perfis = action.payload.limite_perfis; // Atualiza o limite de perfis com base no plano selecionado
-    },
+    }, */
     
 
     selecionarPerfilAtivo: (state, action) => {
@@ -231,14 +231,14 @@ const userSlice = createSlice({
       state.perfis = [];
       state.perfilAtivo = null;
 
-      state.assinatura = {
+      /* state.assinatura = {
         plano_id: null,
         tipo_plano: null,
         limite_perfis: 1,
         tipo_pagamento: null,
         status: "inativo"
 
-      };
+      }; */
 
       state.statusRequest = "idle";
       state.error = null;
@@ -277,14 +277,14 @@ const userSlice = createSlice({
         state.role = usuario?.role || "";
         state.perfis = usuario?.perfis || [];
 
-        state.assinatura = usuario?.assinatura || {
+        /* state.assinatura = usuario?.assinatura || {
           plano_id: null,
           tipo_plano: null,
           limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
 
-        };
+        }; */
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -316,23 +316,23 @@ const userSlice = createSlice({
         state.role = usuario?.role || "";
         state.perfis = usuario?.perfis || []; 
 
-        state.assinatura = usuario?.assinatura || {
+        /* state.assinatura = usuario?.assinatura || {
           plano_id: null,
           tipo_plano: null,
           limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
 
-        };
+        }; */
         
         state.isAuthenticated = true;
         state.error = null;
       })
 
       // PLANO E USUARIO
-      .addCase(atualizarPlano.fulfilled, (state, action) => {
+      /* .addCase(atualizarPlano.fulfilled, (state, action) => {
         state.assinatura = action.payload.assinatura;
-      })
+      }) */
       .addCase(atualizarUsuario.fulfilled, (state, action) => {
         state.nome = action.payload.nome;
         state.sobrenome = action.payload.sobrenome;
@@ -373,5 +373,5 @@ const userSlice = createSlice({
 });
 
 // EXPORTS
-export const { logout, selecionarPlano, selecionarPerfilAtivo } = userSlice.actions;
+export const { logout, selecionarPerfilAtivo } = userSlice.actions;
 export default userSlice.reducer;

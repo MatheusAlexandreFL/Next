@@ -213,7 +213,7 @@ return {
       data_vencimento.setDate(data_inicio.getDate() + 30); // +1 mês de acesso
 
       const assinatura = await Assinatura.findOneAndUpdate(
-        { user_id: userId },
+        { user_id: userId },//uperset para criar ou atualizar a assinatura do usuário
         { user_id: userId ,
           plano_id: plano._id,
           tipo_plano: plano.nome,
