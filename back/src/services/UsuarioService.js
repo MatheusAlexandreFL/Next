@@ -2,6 +2,7 @@ const Usuario = require("../models/Usuario");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Plano = require("../models/Plano");
+const Assinatura = require("../models/Assinatura");
 
 class UsuarioService {
   async criarUsuario(userData) {
@@ -15,13 +16,14 @@ class UsuarioService {
     const novoUsuario = await Usuario.create({
   ...userData,
   senha: senhaHash,
-  assinatura: {
+  assinatura: null, // Inicialmente sem assinatura ativa
+  /* assinatura: {
     plano_id: null,
     tipo_plano: null,
     limite_perfis: 1,
     tipo_pagamento: null,
     status: "inativo"
-  },
+  }, */
   lista_desejos: []
 });
 
@@ -76,7 +78,7 @@ return {
 
 
   async adicionarPerfil(userId, perfilData) {
-    const usuario = await Usuario.findById(userId);
+    const usuario = await Usuario.findById(userId).populate("assinatura");
     
     if (!usuario) {
       throw new Error("Usuário não encontrado.");
@@ -100,7 +102,7 @@ return {
 
   // Lógica para editar um perfil existente
   async editarPerfil(userId, perfilId, novosDados) {
-    const usuario = await Usuario.findById(userId);
+    const usuario = await Usuario.findById(userId).populate("assinatura");
     
     if (!usuario) {
       throw new Error("Usuário não encontrado.");
@@ -122,7 +124,7 @@ return {
   }
 
   async getUsuarioById(userId) {
-    const existeUsuario = await Usuario.findById(userId).populate("lista_desejos", "titulo img_capa");
+    const existeUsuario = await Usuario.findById(userId).populate("lista_desejos", "titulo img_capa").populate("assinatura");
     if (!existeUsuario) {
       throw new Error("Usuário não encontrado.");
     }
@@ -210,9 +212,18 @@ return {
       const data_vencimento = new Date();
       data_vencimento.setDate(data_inicio.getDate() + 30); // +1 mês de acesso
 
-      const user = await Usuario.findByIdAndUpdate(
-        userId,
-        {
+      const assinatura = await Assinatura.findOneAndUpdate(
+        { user_id: userId },
+        { user_id: userId ,
+          plano_id: plano._id,
+          tipo_plano: plano.nome,
+          limite_perfis: plano.limite_perfis, // Define o limite de perfis com base no plano contratado
+          tipo_pagamento: dadosPlano.tipo_pagamento,
+          status: 'ativo',  
+          data_inicio,  
+          data_vencimento
+        },
+          /* {
           assinatura: {
             plano_id: plano._id,
             tipo_plano: plano.nome,
@@ -221,10 +232,16 @@ return {
             status: 'ativo',  
             data_inicio,  
             data_vencimento
-          }
-        },
-        { new: true }
+          } */
+        { upsert: true, new: true,  setDefaultsOnInsert: true }
       );
+
+      //Depois, referenciar no usuario 
+      const user = await Usuario.findByIdAndUpdate(
+        userId,
+        { assinatura: assinatura._id }, // Referencia a assinatura criada
+        { new: true }
+      ).populate("assinatura");
         
       if (!user) {
         throw new Error("Usuário não encontrado.");
@@ -235,7 +252,7 @@ return {
     }
 
   async login(email, senha) {
-    const user = await Usuario.findOne({ email });
+    const user = await Usuario.findOne({ email }).populate("assinatura");
 
     if (!user) {
       throw new Error("Usuário não encontrado.");
@@ -252,6 +269,8 @@ return {
     };
 
     const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "24h" });
+
+    
 
     return { 
       token, 
