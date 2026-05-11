@@ -8,7 +8,7 @@ import posterImages from "../constants/posterImages";
 
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { atualizarPlano } from "../store/userSlice";
+import { atualizarPlano } from "../store/AssinaturaSlice";
 
 export default function Pagamento() {
   const [cardData, setCardData] = useState({
@@ -70,6 +70,7 @@ export default function Pagamento() {
   }
 
   const user = useSelector(state => state.user);
+  const assinatura = useSelector(state => state.assinatura);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -81,7 +82,7 @@ export default function Pagamento() {
       return;
     }
 
-    if (!user.assinatura?.plano_id) {
+    if (!assinatura.assinaturaEmSelecao?.plano_id) {
       alert("Selecione um plano antes de iniciar a assinatura.");
       return;
     }
@@ -112,7 +113,7 @@ export default function Pagamento() {
         atualizarPlano({
          /*  id: user.id,
           tipo_plano: user.assinatura?.tipo_plano, */
-          plano_id: user.assinatura?.plano_id,
+          plano_id: assinatura.assinaturaEmSelecao?.plano_id,
           tipo_pagamento: "credito" 
         })
       ).unwrap();
