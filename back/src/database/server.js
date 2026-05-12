@@ -8,6 +8,7 @@ const ConteudoRoutes = require("../routes/ConteudoRoutes");
 const UsuarioRoutes = require("../routes/UsuarioRoutes");
 const AvaliacaoRoutes = require("../routes/AvaliacaoRoutes");
 const PlanoRoutes = require("../routes/PlanosRoutes");
+const ProxyRoutes = require("../routes/ProxyRoutes");
 
 connectDB();
 
@@ -21,6 +22,7 @@ app.use(ConteudoRoutes);
 app.use(UsuarioRoutes);
 app.use(AvaliacaoRoutes);
 app.use(PlanoRoutes);
+app.use(ProxyRoutes);
 
 const PORT = process.env.SERVER_PORT;
 const HOST = process.env.SERVER_HOST;
