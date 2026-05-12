@@ -5,7 +5,7 @@ import posterImages from "../constants/posterImages";
 import api from "../services/api";
 
 import { useDispatch } from "react-redux";
-import { selecionarPlano } from "../store/userSlice";
+import { selecionarPlano } from "../store/AssinaturaSlice";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
  
@@ -16,7 +16,7 @@ export default function Planos() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const user = useSelector(state => state.user);
+
 
   const [planoSelecionado, setPlanoSelecionado] = useState(null);
   const [loading, setLoading] = useState(true);

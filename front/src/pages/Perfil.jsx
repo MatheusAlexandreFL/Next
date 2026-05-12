@@ -10,7 +10,7 @@ export default function Perfil() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-
+  const assinatura = useSelector((state) => state.assinatura);
   
   /* const LIMITES_POR_PLANO = {
     basico: 1,
@@ -21,7 +21,7 @@ export default function Perfil() {
   const planoAtual = user.assinatura?.tipo_plano?.toLowerCase() || "basico";
   const limiteDePerfis = LIMITES_POR_PLANO[planoAtual] || 1; */
 
-  const limiteDePerfis = user.assinatura?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
+  const limiteDePerfis = assinatura.assinaturaAtiva?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
 
  
   const perfisAtuais = user.perfis || [

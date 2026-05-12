@@ -12,6 +12,7 @@ export default function GerenciarPerfis() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const assinatura = useSelector((state) => state.assinatura);
 
 
   const [perfilEmEdicao, setPerfilEmEdicao] = useState(null); 
@@ -27,7 +28,7 @@ export default function GerenciarPerfis() {
   const limiteDePerfis = LIMITES_POR_PLANO[planoAtual] || 1;
   const podeAdicionarPerfil = limiteDePerfis > 1 && perfisAtuais.length < limiteDePerfis; */
 
-  const limiteDePerfis = user.assinatura?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
+  const limiteDePerfis = assinatura.assinaturaAtiva?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
   const podeAdicionarPerfil = perfisAtuais.length < limiteDePerfis;
 
 

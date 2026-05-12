@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { atualizarPlano } from "../store/userSlice";
+import { atualizarPlano } from "../store/AssinaturaSlice";
 import { atualizarUsuario } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -10,11 +10,13 @@ import api from "../services/api";
 export default function PerfilUser() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const assinatura = useSelector((state) => state.assinatura);
+  const assinaturaAtiva = assinatura.assinaturaAtiva;
   const navigate = useNavigate();
 
   
 const [planos, setPlanos] = useState([]);
-const [novoPlano, setNovoPlano] = useState(user.assinatura?.plano_id || "");
+const [novoPlano, setNovoPlano] = useState(assinaturaAtiva?.plano_id || "");
 const [loading, setLoading] = useState(false);
 
 useEffect(() => {
@@ -30,15 +32,8 @@ async function carregarPlanos() {
   }
 }
       
-
-
-
-
-
-  const planoAtual = user.assinatura?.tipo_plano || "Nenhum plano selecionado";
+  const planoAtual = assinaturaAtiva?.tipo_plano || "Nenhum plano selecionado";
  
- 
-
   const [nome, setNome] = useState(user.nome || "");
   const [sobrenome, setSobrenome] = useState(user.sobrenome || "");
   const [dataNascimento, setDataNascimento] = useState(user.data_nascimento ? String(user.data_nascimento).substring(0, 10) : ""); // Formata para YYYY-MM-DD
@@ -79,7 +74,7 @@ async function carregarPlanos() {
       return;
     }
 
-    if (novoPlano === user.assinatura?.plano_id) {
+    if (novoPlano === assinaturaAtiva?.plano_id) {
       alert("Você já está nesse plano.");
       return;
     }
@@ -90,7 +85,7 @@ async function carregarPlanos() {
       await dispatch(
         atualizarPlano({ 
           plano_id: novoPlano,
-          tipo_pagamento: user.assinatura?.tipo_pagamento || "cartao"
+          tipo_pagamento: assinaturaAtiva?.tipo_pagamento || "cartao"
 
         })
       ).unwrap();
@@ -195,7 +190,7 @@ async function carregarPlanos() {
           <div className="grid gap-4 md:grid-cols-3">
         {planos.map((plano) => {
           const ativo = novoPlano === plano._id;
-          const isAtual = user.assinatura?.plano_id === plano._id;
+          const isAtual = assinaturaAtiva?.plano_id === plano._id;
 
           return (
             <button
@@ -233,7 +228,7 @@ async function carregarPlanos() {
             <button
               onClick={handleAtualizarPlano}
               
-              disabled={!novoPlano || novoPlano === user.assinatura?.plano_id}
+              disabled={!novoPlano || novoPlano === assinaturaAtiva?.plano_id}
               
               className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
             >
