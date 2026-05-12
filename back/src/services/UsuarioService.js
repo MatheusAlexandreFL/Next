@@ -8,7 +8,7 @@ class UsuarioService {
   async criarUsuario(userData) {
     const existeEmail = await Usuario.findOne({ email: userData.email });
     if (existeEmail) {
-      throw new Error("Erro ao criar usuário."); // Não expor detalhes para segurança
+      throw new Error("Este e-mail já está em uso."); 
     }
     const salt = bcrypt.genSaltSync(10);
     const senhaHash = bcrypt.hashSync(userData.senha, salt);

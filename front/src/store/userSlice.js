@@ -182,19 +182,18 @@ const initialState = {
   lista_desejos: parsedUser?.lista_desejos || [],
   perfis: parsedUser?.perfis || [],
   perfilAtivo: null,
-  /* assinatura: parsedUser?.assinatura || {
+  assinatura: parsedUser?.assinatura || {
     plano_id: null,
     tipo_plano: null,
     limite_perfis: 1,
     tipo_pagamento: null,
     status: "inativo"
-  }, */
+  },
   token: sessionStorage.getItem("token") || null,
   isAuthenticated: !!sessionStorage.getItem("token"),
   statusRequest: "idle",
   error: null
 };
-
 
 // SLICE
 const userSlice = createSlice({
@@ -231,14 +230,13 @@ const userSlice = createSlice({
       state.perfis = [];
       state.perfilAtivo = null;
 
-      /* state.assinatura = {
+      state.assinatura = {
         plano_id: null,
         tipo_plano: null,
         limite_perfis: 1,
         tipo_pagamento: null,
         status: "inativo"
-
-      }; */
+      };
 
       state.statusRequest = "idle";
       state.error = null;
@@ -277,14 +275,13 @@ const userSlice = createSlice({
         state.role = usuario?.role || "";
         state.perfis = usuario?.perfis || [];
 
-        /* state.assinatura = usuario?.assinatura || {
+        state.assinatura = usuario?.assinatura || {
           plano_id: null,
           tipo_plano: null,
           limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
-
-        }; */
+        };
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -316,14 +313,13 @@ const userSlice = createSlice({
         state.role = usuario?.role || "";
         state.perfis = usuario?.perfis || []; 
 
-        /* state.assinatura = usuario?.assinatura || {
+        state.assinatura = usuario?.assinatura || {
           plano_id: null,
           tipo_plano: null,
           limite_perfis: 1,
           tipo_pagamento: null,
           status: "inativo"
-
-        }; */
+        };
         
         state.isAuthenticated = true;
         state.error = null;

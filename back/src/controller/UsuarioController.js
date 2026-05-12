@@ -29,9 +29,12 @@ class UsuarioController {
         email,
         senha,
         role: 'user',
-        data_nascimento,
         foto: imagePath
       };
+
+      if (data_nascimento) {
+        userData.data_nascimento = data_nascimento;
+      }
       
       const novoUsuario = await UsuarioService.criarUsuario(userData);
 
@@ -42,7 +45,7 @@ class UsuarioController {
 
       });
     } catch (e) {
-      return res.status(500).json({ erro: e.message });
+      return res.status(400).json({ erro: e.message });
     }
   }
 
