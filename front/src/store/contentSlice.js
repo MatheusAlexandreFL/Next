@@ -43,13 +43,47 @@ export const adicionarEpisodio = createAsyncThunk(
       // Note que o ID vai na URL, e o restante no body
       const response = await api.patch(
         `/conteudos/${serieId}/episodios`, 
-        { numeroTemporada, episodio: dadosEpisodio },
+        dadosEpisodio,
         config
       );
 
       return response.data.serie; // Retorna a série atualizada do backend
     } catch (err) {
       return rejectWithValue(err.response?.data?.error || "Erro ao adicionar episódio");
+    }
+  }
+);
+
+// Thunk para atualizar conteúdo
+export const atualizarConteudo = createAsyncThunk(
+  "content/atualizar",
+  async ({ id, formData }, { getState, rejectWithValue }) => {
+    try {
+      const { user } = getState();
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` }
+      };
+      const response = await api.patch(`/conteudos/${id}`, formData, config);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || "Erro ao atualizar conteúdo");
+    }
+  }
+);
+
+// Thunk para atualizar episódio
+export const atualizarEpisodio = createAsyncThunk(
+  "content/atualizarEpisodio",
+  async ({ serieId, episodioId, formData }, { getState, rejectWithValue }) => {
+    try {
+      const { user } = getState();
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` }
+      };
+      const response = await api.patch(`/conteudos/${serieId}/episodios/${episodioId}`, formData, config);
+      return response.data.serie;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || "Erro ao atualizar episódio");
     }
   }
 );
@@ -71,6 +105,19 @@ const contentSlice = createSlice({
         state.items.push(action.payload);
       })
       .addCase(adicionarEpisodio.fulfilled, (state, action) => {
+        const serieAtualizada = action.payload;
+        const index = state.items.findIndex(c => c._id === serieAtualizada._id);
+        if (index !== -1) {
+          state.items[index] = serieAtualizada;
+        }
+      })
+      .addCase(atualizarConteudo.fulfilled, (state, action) => {
+        const index = state.items.findIndex(c => c._id === action.payload._id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(atualizarEpisodio.fulfilled, (state, action) => {
         const serieAtualizada = action.payload;
         const index = state.items.findIndex(c => c._id === serieAtualizada._id);
         if (index !== -1) {

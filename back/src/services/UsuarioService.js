@@ -1,23 +1,58 @@
 const Usuario = require("../models/Usuario");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Plano = require("../models/Plano");
+const Assinatura = require("../models/Assinatura");
 
 class UsuarioService {
   async criarUsuario(userData) {
     const existeEmail = await Usuario.findOne({ email: userData.email });
     if (existeEmail) {
-      throw new Error("Erro ao criar usuário."); // Não expor detalhes para segurança
+      throw new Error("Este e-mail já está em uso."); 
     }
     const salt = bcrypt.genSaltSync(10);
     const senhaHash = bcrypt.hashSync(userData.senha, salt);
 
     const novoUsuario = await Usuario.create({
-      ...userData,
-      senha: senhaHash,
-      assinatura: { status: 'inativo' },
-      lista_desejos: []
-    });
-    return novoUsuario;
+  ...userData,
+  senha: senhaHash,
+  assinatura: null, // Inicialmente sem assinatura ativa
+  /* assinatura: {
+    plano_id: null,
+    tipo_plano: null,
+    limite_perfis: 1,
+    tipo_pagamento: null,
+    status: "inativo"
+  }, */
+  lista_desejos: []
+});
+
+const payload = {
+  id: novoUsuario._id,
+  role: novoUsuario.role
+};
+
+const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "24h" });
+
+return {
+  token,
+  usuario: {
+    id: novoUsuario._id,
+    nome: novoUsuario.nome,
+    sobrenome: novoUsuario.sobrenome,
+    email: novoUsuario.email,
+    data_nascimento: novoUsuario.data_nascimento,
+    role: novoUsuario.role,
+    perfis: novoUsuario.perfis || [],
+    assinatura: novoUsuario.assinatura || {
+      plano_id: null,
+      tipo_plano: null,
+      limite_perfis: 1,
+      tipo_pagamento: null,
+      status: "inativo"
+    }
+  }
+};
   }
 
   async atualizarPerfil(userId, novosDados) {
@@ -41,8 +76,55 @@ class UsuarioService {
     return usuarioAtualizado;
   }
 
+
+  async adicionarPerfil(userId, perfilData) {
+    const usuario = await Usuario.findById(userId).populate("assinatura");
+    
+    if (!usuario) {
+      throw new Error("Usuário não encontrado.");
+    }
+
+   /*  const tipoPlano = usuario.assinatura?.tipo_plano?.toLowerCase() || 'basico';
+    const LIMITES_POR_PLANO = { basico: 1, padrao: 2, premium: 4 };
+    const limite = LIMITES_POR_PLANO[tipoPlano] || 1; */
+
+    const limite = usuario.assinatura?.limite_perfis || 1; // Usa o limite definido na assinatura do usuário, ou 1 se não tiver assinatura ativa
+
+    if (usuario.perfis.length >= limite) { 
+      throw new Error("Você atingiu o limite de perfis do seu plano.");
+    }
+
+    usuario.perfis.push(perfilData);
+    await usuario.save();
+
+    return usuario;
+  }
+
+  // Lógica para editar um perfil existente
+  async editarPerfil(userId, perfilId, novosDados) {
+    const usuario = await Usuario.findById(userId).populate("assinatura");
+    
+    if (!usuario) {
+      throw new Error("Usuário não encontrado.");
+    }
+
+    const perfil = usuario.perfis.id(perfilId); 
+    
+    if (!perfil) {
+      throw new Error("Perfil não encontrado.");
+    }
+
+    
+    if (novosDados.nome) perfil.nome = novosDados.nome;
+    if (novosDados.avatar) perfil.avatar = novosDados.avatar;
+
+    await usuario.save(); 
+
+    return usuario;
+  }
+
   async getUsuarioById(userId) {
-    const existeUsuario = await Usuario.findById(userId).populate("lista_desejos", "titulo img_capa");
+    const existeUsuario = await Usuario.findById(userId).populate("lista_desejos", "titulo img_capa").populate("assinatura");
     if (!existeUsuario) {
       throw new Error("Usuário não encontrado.");
     }
@@ -92,7 +174,7 @@ class UsuarioService {
     return deletaDaLista;
   }
 
-  async atualizarAssinatura(userId, dadosPlano) {
+ /*  async atualizarAssinatura(userId, dadosPlano) {
     const data_inicio = new Date(); // Data atual como início da assinatura. Numa renovação, a prática irá mudar
     const data_vencimento = new Date();
     data_vencimento.setDate(data_inicio.getDate() + 30); // +1 mês de acesso
@@ -115,10 +197,62 @@ class UsuarioService {
       throw new Error("Usuário não encontrado.");
     }
     return user;
-  }
+  } */
+
+    async atualizarAssinatura(userId, dadosPlano) {
+      const plano = await Plano.findOne({_id: dadosPlano.plano_id,
+      ativo: true
+      });
+
+      if (!plano) {
+        throw new Error("Plano não encontrado ou inativo.");
+      }
+
+      const data_inicio = new Date(); // Data atual como início da assinatura. Numa renovação, a prática irá mudar
+      const data_vencimento = new Date();
+      data_vencimento.setDate(data_inicio.getDate() + 30); // +1 mês de acesso
+
+      const assinatura = await Assinatura.findOneAndUpdate(
+        { user_id: userId },//uperset para criar ou atualizar a assinatura do usuário
+        { user_id: userId ,
+          plano_id: plano._id,
+          tipo_plano: plano.nome,
+          limite_perfis: plano.limite_perfis, // Define o limite de perfis com base no plano contratado
+          tipo_pagamento: dadosPlano.tipo_pagamento,
+          status: 'ativo',  
+          data_inicio,  
+          data_vencimento
+        },
+          /* {
+          assinatura: {
+            plano_id: plano._id,
+            tipo_plano: plano.nome,
+            limite_perfis: plano.limite_perfis, // Define o limite de perfis com base no plano contratado
+            tipo_pagamento: dadosPlano.tipo_pagamento,
+            status: 'ativo',  
+            data_inicio,  
+            data_vencimento
+          } */
+        { upsert: true, new: true,  setDefaultsOnInsert: true }
+      );
+
+      //Depois, referenciar no usuario 
+      const user = await Usuario.findByIdAndUpdate(
+        userId,
+        { assinatura: assinatura._id }, // Referencia a assinatura criada
+        { new: true }
+      ).populate("assinatura");
+        
+      if (!user) {
+        throw new Error("Usuário não encontrado.");
+      } 
+
+      return user;
+
+    }
 
   async login(email, senha) {
-    const user = await Usuario.findOne({ email });
+    const user = await Usuario.findOne({ email }).populate("assinatura");
 
     if (!user) {
       throw new Error("Usuário não encontrado.");
@@ -136,6 +270,8 @@ class UsuarioService {
 
     const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "24h" });
 
+    
+
     return { 
       token, 
       usuario: { 
@@ -143,9 +279,12 @@ class UsuarioService {
       nome: user.nome, 
       email: user.email,
       role: user.role,
+      perfis: user.perfis,
       assinatura: user.assinatura || {
+        plano_id: null,//adicionado
         tipo_plano: null,
         tipo_pagamento: null,
+        limite_perfis: 1,//adicionado
         status: "inativo"
       }
     }};
