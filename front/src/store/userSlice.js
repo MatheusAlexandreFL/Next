@@ -182,6 +182,7 @@ const initialState = {
   lista_desejos: parsedUser?.lista_desejos || [],
   perfis: parsedUser?.perfis || [],
   perfilAtivo: null,
+  //essa estrutura foi para o slice Assinatura  
   /* assinatura: parsedUser?.assinatura || {
     plano_id: null,
     tipo_plano: null,
@@ -230,6 +231,7 @@ const userSlice = createSlice({
       state.perfis = [];
       state.perfilAtivo = null;
 
+       //essa estrutura foi para o slice Assinatura
       /* state.assinatura = {
         plano_id: null,
         tipo_plano: null,
