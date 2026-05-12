@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, selecionarPerfilAtivo } from "../store/userSlice";
 import logo from '../assets/logo.png';
+import { getImageUrl } from "../utils/getImageUrl";
 
 function NavBar() {
   const user = useSelector(state => state.user);
@@ -42,7 +43,7 @@ function NavBar() {
             onClick={() => trocarPerfil(perfil)}
             className="flex items-center gap-3 px-4 py-2 hover:underline cursor-pointer"
           >
-            <img src={perfil.avatar} alt={perfil.nome} className="w-8 h-8 rounded object-cover" />
+            <img src={getImageUrl(perfil.avatar)} alt={perfil.nome} className="w-8 h-8 rounded object-cover" />
             <span className="text-sm text-gray-300">{perfil.nome}</span>
           </div>
         ))}
@@ -101,7 +102,7 @@ function NavBar() {
             {/* AVATAR MOBILE COM HOVER */}
             <div className='relative flex items-center gap-2 cursor-pointer group'>
               <img
-                src={perfilAtivo?.avatar || "https://picsum.photos/32/32?random=profile"}
+                src={perfilAtivo?.avatar ? getImageUrl(perfilAtivo.avatar) : "https://picsum.photos/32/32?random=profile"}
                 alt="Avatar"
                 className='w-8 h-8 rounded border border-transparent group-hover:border-white transition-colors'
               />
@@ -155,7 +156,7 @@ function NavBar() {
           {/* AVATAR DESKTOP COM HOVER E SETA ROTACIONAL */}
           <div className='relative flex items-center gap-2 cursor-pointer group py-2'>
             <img
-              src={perfilAtivo?.avatar || "https://picsum.photos/32/32?random=profile"}
+              src={perfilAtivo?.avatar ? getImageUrl(perfilAtivo.avatar) : "https://picsum.photos/32/32?random=profile"}
               alt="Avatar"
               className='w-8 h-8 rounded border border-transparent group-hover:border-white transition-colors'
             />

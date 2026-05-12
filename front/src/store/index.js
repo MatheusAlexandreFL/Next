@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./userSlice";
+import contentReducer from "./contentSlice";
 import assinaturaReducer from "./AssinaturaSlice";
 
 /* const DEFAULT_ASSINATURA = {
@@ -49,6 +50,7 @@ const loadState = () => {
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    content: contentReducer,
     assinatura: assinaturaReducer
   },
   //usando o localStorage

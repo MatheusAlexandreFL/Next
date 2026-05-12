@@ -3,13 +3,23 @@ import FooNavBar from '../components/FooNavBar.jsx'
 import Carousel from '../components/Carousel.jsx'
 import ListCard from '../components/ListCard.jsx'
 
-import posterImages from '../constants/posterImages'
-
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { adicionarWishlist } from '../store/userSlice'
+import { listarConteudos } from '../store/contentSlice'
+import { useEffect } from 'react'
 
 function Filme() {
   const dispatch = useDispatch()
+  const contents = useSelector(state => state.content.items)
+  const status = useSelector(state => state.content.status)
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(listarConteudos())
+    }
+  }, [status, dispatch])
+
+  const filmes = contents.filter(c => c.tipo_midia === 'filme')
 
   const handleAddWishlist = (id) => {
     dispatch(adicionarWishlist(id))
@@ -18,23 +28,23 @@ function Filme() {
   const sections = [
     {
       title: "Lançamentos",
-      data: posterImages.slice(1, 7)
+      data: filmes.slice(0, 6)
     },
     {
       title: "Ação e Aventura",
-      data: posterImages.slice(15, 21)
+      data: filmes.filter(c => c.genero?.includes('Ação') || c.genero?.includes('Aventura')).slice(0, 6)
     },
     {
       title: "Ficção Científica",
-      data: posterImages.slice(2, 8)
+      data: filmes.filter(c => c.genero?.includes('Ficção Científica')).slice(0, 6)
     },
     {
       title: "Filmes Clássicos",
-      data: posterImages.slice(32, 38)
+      data: filmes.slice(4, 10) // Just to have different slices
     }
   ]
 
-  const carouselImgLink = posterImages.slice(10, 19)
+  const carouselItems = filmes.slice(0, 9)
 
   return (
     <div className='flex flex-col min-h-screen bg-[#0d1117] relative pb-20'>
@@ -50,7 +60,7 @@ function Filme() {
           <h1 className='text-xl font-semibold text-white/90 mb-4 border-l-4 border-purple-600 pl-3'>
             Filmes em Destaque
           </h1>
-          <Carousel imgLink={carouselImgLink} />
+          <Carousel items={carouselItems} />
         </section>
 
         {/* Categorias de Filmes */}
@@ -61,7 +71,7 @@ function Filme() {
             </h1>
 
             <ListCard 
-              imgLink={section.data} 
+              items={section.data} 
               onAddWishlist={handleAddWishlist}
             />
           </section>

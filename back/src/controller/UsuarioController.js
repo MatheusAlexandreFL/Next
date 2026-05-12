@@ -18,7 +18,7 @@ class UsuarioController {
 
       if (req.files && req.files.foto) {
         const foto = req.files.foto;
-        const caminho = `uploads/${Date.now()}_${foto.name}`;
+        const caminho = `uploads/usuarios/${Date.now()}_${foto.name}`;
         await foto.mv(caminho);
         imagePath = `/${caminho}`;
       }
@@ -65,7 +65,7 @@ class UsuarioController {
       let imagePath = null;
       if (req.files && req.files.foto) {
         const foto = req.files.foto;
-        const caminho = `uploads/${Date.now()}_${foto.name}`;
+        const caminho = `uploads/usuarios/${Date.now()}_${foto.name}`;
         await foto.mv(caminho);
         imagePath = `/${caminho}`;
       }

@@ -7,11 +7,10 @@ import Perfil from "./pages/Perfil";
 import Landing from "./pages/Landing";
 import HomePage from "./pages/HomePage.jsx";
 import WatchContent from "./pages/WatchContent.jsx";
+import ContentInfo from "./pages/ContentInfo.jsx";
 import WishList from "./pages/WishList.jsx";
-import AdminCadastro from "./pages/AdminCadastro.jsx";
 import AdminHome from "./pages/AdminHome.jsx";
-import AdminEpisodios from "./pages/AdminEpisodios.jsx";
-import AdminRemover from "./pages/adminRemover.jsx";
+import AdminCatalogo from "./pages/AdminCatalogo.jsx";
 import PerfilUser from "./pages/PerfilUser.jsx";
 import GerenciarPerfis from "./pages/GerenciarPerfis.jsx";
 import AdicionarPerfil from "./pages/AdicionarPerfil.jsx";
@@ -33,13 +32,12 @@ function App() {
         <Route path="/pagamento" element={<Pagamento />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/video" element={<WatchContent />} />
+        <Route path="/info/:id" element={<ContentInfo />} />
+        <Route path="/video/:id" element={<WatchContent />} />
         <Route path="/wishlist" element={<WishList />} />
         <Route path="/admin" element={<AdminHome />} />
-        <Route path="/admin/cadastro" element={<AdminCadastro />} />
         <Route path="/perfilUser" element={<PerfilUser />} />
-        <Route path="/admin/episodios" element={<AdminEpisodios />} />
-        <Route path="/admin/remover" element={<AdminRemover />} />
+        <Route path="/admin/catalogo" element={<AdminCatalogo />} />
         <Route path="/gerenciar-perfis" element={<GerenciarPerfis />} />
         <Route path="/adicionar-perfil" element={<AdicionarPerfil />} />
         <Route path="/serie" element={<Serie />} />
