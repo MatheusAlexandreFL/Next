@@ -3,13 +3,23 @@ import FooNavBar from '../components/FooNavBar.jsx'
 import Carousel from '../components/Carousel.jsx'
 import ListCard from '../components/ListCard.jsx'
 
-import posterImages from '../constants/posterImages'
-
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { adicionarWishlist } from '../store/userSlice'
+import { listarConteudos } from '../store/contentSlice'
+import { useEffect } from 'react'
 
 function Serie() {
   const dispatch = useDispatch()
+  const contents = useSelector(state => state.content.items)
+  const status = useSelector(state => state.content.status)
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(listarConteudos())
+    }
+  }, [status, dispatch])
+
+  const series = contents.filter(c => c.tipo_midia === 'serie')
 
   const handleAddWishlist = (id) => {
     dispatch(adicionarWishlist(id))
@@ -18,23 +28,23 @@ function Serie() {
   const sections = [
     {
       title: "Séries de Anime",
-      data: posterImages.slice(25, 31)
+      data: series.filter(c => c.genero?.includes('Anime')).slice(0, 6)
     },
     {
       title: "Séries Dramáticas",
-      data: posterImages.slice(6, 12)
+      data: series.filter(c => c.genero?.includes('Drama')).slice(0, 6)
     },
     {
       title: "Desenhos Animados",
-      data: posterImages.slice(12, 18)
+      data: series.filter(c => c.genero?.includes('Animação')).slice(0, 6)
     },
     {
       title: "Recomendados para você",
-      data: posterImages.slice(18, 24)
+      data: series.slice(0, 6)
     }
   ]
 
-  const carouselImgLink = posterImages.slice(20, 29)
+  const carouselItems = series.slice(0, 9)
 
   return (
     <div className='flex flex-col min-h-screen bg-[#0d1117] relative pb-20'>
@@ -50,7 +60,7 @@ function Serie() {
           <h1 className='text-xl font-semibold text-white/90 mb-4 border-l-4 border-purple-600 pl-3'>
             Séries em Destaque
           </h1>
-          <Carousel imgLink={carouselImgLink} />
+          <Carousel items={carouselItems} />
         </section>
 
         {/* Categorias de Séries */}
@@ -61,7 +71,7 @@ function Serie() {
             </h1>
 
             <ListCard 
-              imgLink={section.data} 
+              items={section.data} 
               onAddWishlist={handleAddWishlist}
             />
           </section>

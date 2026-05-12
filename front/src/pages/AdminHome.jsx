@@ -40,49 +40,29 @@ export default function AdminHome() {
         {/* GRID DE BOTÕES/AÇÕES */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {/* BOTÃO: CRIAR CONTEÚDO */}
-          <Link to="/admin/cadastro" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-purple-500/50 transition-all">
-            <div className="bg-purple-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors">
-              <IoAddCircleOutline className="text-2xl text-purple-500 group-hover:text-white" />
+          <Link to="/admin/planos" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-cyan-500/50 transition-all">
+            <div className="bg-cyan-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-600 transition-colors">
+              <IoListOutline className="text-2xl text-cyan-500 group-hover:text-white" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Novo Conteúdo</h3>
-            <p className="text-sm text-gray-500">Cadastrar filmes ou séries inéditas no MongoDB.</p>
+            <h3 className="text-xl font-bold mb-2">Gerenciar Planos</h3>
+            <p className="text-sm text-gray-500">Criar, editar e desativar planos da plataforma.</p>
           </Link>
 
-          <Link to="/admin/planos" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-cyan-500/50 transition-all">
-          <div className="bg-cyan-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-600 transition-colors">
-            <IoListOutline className="text-2xl text-cyan-500 group-hover:text-white" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Gerenciar Planos</h3>
-          <p className="text-sm text-gray-500">Criar, editar e desativar planos da plataforma.</p>
-        </Link>
+          <Link to="/admin/catalogo" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-purple-500/50 transition-all">
+            <div className="bg-purple-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors">
+              <IoPlayForwardOutline className="text-2xl text-purple-500 group-hover:text-white" />
+            </div>
+            <h3 className="text-xl font-bold mb-2">Gerenciar Catálogo</h3>
+            <p className="text-sm text-gray-500">Adicionar, editar e remover filmes, séries e episódios.</p>
+          </Link>
 
-          {/* BOTÃO: LISTAR/ATUALIZAR (listarConteudos) */}
-          <button onClick={handleRefreshList} className="text-left group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-purple-500/50 transition-all">
+          <button onClick={handleRefreshList} className="text-left group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-blue-500/50 transition-all">
             <div className="bg-blue-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
               <IoListOutline className="text-2xl text-blue-500 group-hover:text-white" />
             </div>
             <h3 className="text-xl font-bold mb-2">Sincronizar Catálogo</h3>
             <p className="text-sm text-gray-500">Forçar atualização do estado global do Redux.</p>
           </button>
-
-          {/* BOTÃO: GERENCIAR EPISÓDIOS (adicionarEpisodio) */}
-          <Link to="/admin/episodios" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-purple-500/50 transition-all">
-            <div className="bg-green-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors">
-              <IoPlayForwardOutline className="text-2xl text-green-500 group-hover:text-white" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Adicionar Episódios</h3>
-            <p className="text-sm text-gray-500">Incluir novos capítulos em temporadas existentes.</p>
-          </Link>
-
-          {/* BOTÃO: DELETAR CONTEÚDO (deletarConteudo) */}
-          <Link to="/admin/remover" className="group p-6 bg-[#161b22] border border-white/5 rounded-2xl hover:border-red-500/50 transition-all">
-            <div className="bg-red-600/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
-              <IoTrashOutline className="text-2xl text-red-500 group-hover:text-white" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Remover Títulos</h3>
-            <p className="text-sm text-gray-500">Excluir permanentemente do banco de dados.</p>
-          </Link>
 
         </div>
       </main>

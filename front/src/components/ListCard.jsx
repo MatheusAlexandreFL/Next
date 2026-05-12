@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from "../utils/getImageUrl";
 
 function gridColSize() {
   const [columns, setColumns] = useState(1);
@@ -19,12 +21,13 @@ function gridColSize() {
   return columns;
 }
 
-function ListCard({ imgLink = [] }) {
+function ListCard({ items = [] }) {
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const cols = gridColSize();
 
-  const maxCardLength = imgLink.length - (imgLink.length % cols);
-  const visibleImages = imgLink.slice(0, maxCardLength);
+  const maxCardLength = items.length - (items.length % cols);
+  const visibleImages = items.slice(0, maxCardLength);
 
   return (
     <section className='relative w-full'>
@@ -35,14 +38,15 @@ function ListCard({ imgLink = [] }) {
           ${!isExpanded ? 'max-h-[50vh]' : 'max-h-500'} 
         `}
       >
-        {visibleImages.map((image, index) => (
+        {visibleImages.map((item, index) => (
           <div 
-            key={index} 
-            className='aspect-video bg-[#1a1a1c] rounded-lg overflow-hidden group border border-white/5 hover:border-purple-600/50 transition-colors duration-300'
+            key={item._id || index} 
+            className='aspect-video bg-[#1a1a1c] rounded-lg overflow-hidden group border border-white/5 hover:border-purple-600/50 transition-colors duration-300 cursor-pointer'
+            onClick={() => navigate(`/info/${item._id}`)}
           >
             <img
-              src={image}
-              alt={`Catálogo ${index}`}
+              src={getImageUrl(item.img_capa)}
+              alt={item.titulo || `Catálogo ${index}`}
               className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
             />
           </div>

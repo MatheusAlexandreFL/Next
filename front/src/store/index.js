@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./userSlice";
+import contentReducer from "./contentSlice";
 
 const DEFAULT_ASSINATURA = {
   tipo_plano: null,
@@ -39,7 +40,8 @@ const loadState = () => {
 
 export const store = configureStore({
   reducer: {
-    user: userReducer
+    user: userReducer,
+    content: contentReducer
   },
   //usando o localStorage
   preloadedState: loadState()//se tiver algo no localStorage, ele vai usar, se não, ele vai usar o estado inicial do userSlice.js

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi"; // Ícone de + (lembre de instalar react-icons se não tiver)
 import { useDispatch } from "react-redux";
 import { selecionarPerfilAtivo } from "../store/userSlice";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function Perfil() {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export default function Perfil() {
               {}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-10"></div>
               <img
-                src={perfil.avatar}
+                src={getImageUrl(perfil.avatar)}
                 alt={perfil.nome}
                 className="w-full h-full object-cover"
               />

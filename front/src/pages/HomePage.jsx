@@ -3,13 +3,21 @@ import FooNavBar from '../components/FooNavBar.jsx'
 import Carousel from '../components/Carousel.jsx'
 import ListCard from '../components/ListCard.jsx'
 
-import posterImages from '../constants/posterImages'
-
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { adicionarWishlist } from '../store/userSlice'
+import { listarConteudos } from '../store/contentSlice'
+import { useEffect } from 'react'
 
 function HomePage() {
   const dispatch = useDispatch()
+  const contents = useSelector(state => state.content.items)
+  const status = useSelector(state => state.content.status)
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(listarConteudos())
+    }
+  }, [status, dispatch])
 
   const handleAddWishlist = (id) => {
     dispatch(adicionarWishlist(id))
@@ -19,23 +27,23 @@ function HomePage() {
   const sections = [
     {
       title: "Filmes novos",
-      data: posterImages.slice(0, 6)
+      data: contents.filter(c => c.tipo_midia === 'filme').slice(0, 6)
     },
     {
       title: "Bombando",
-      data: posterImages.slice(6, 12)
+      data: contents.slice(0, 6)
     },
     {
       title: "Ação",
-      data: posterImages.slice(12, 18)
+      data: contents.filter(c => c.genero?.includes('Ação')).slice(0, 6)
     },
     {
       title: "Recomendados para você",
-      data: posterImages.slice(18, 24)
+      data: contents.slice(2, 8)
     }
   ]
 
-  const carouselImgLink = posterImages.slice(0, 9)
+  const carouselItems = contents.slice(0, 9)
 
   return (
     <div className='flex flex-col min-h-screen bg-[#0d1117] relative pb-20'>
@@ -51,7 +59,7 @@ function HomePage() {
           <h1 className='text-xl font-semibold text-white/90 mb-4 border-l-4 border-purple-600 pl-3'>
             Destaques
           </h1>
-          <Carousel imgLink={carouselImgLink} />
+          <Carousel items={carouselItems} />
         </section>
 
         {}
@@ -62,7 +70,7 @@ function HomePage() {
             </h1>
 
             <ListCard 
-              imgLink={section.data} 
+              items={section.data} 
               onAddWishlist={handleAddWishlist}
             />
           </section>

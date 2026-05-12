@@ -11,8 +11,46 @@ import {
   MediaFullscreenButton,
 } from "media-chrome/react";
 
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { listarConteudos } from "../store/contentSlice";
+
 function WatchContent() {
-  const src = 'https://www.youtube.com/watch?v=C5tn1MvXsLw';
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const contents = useSelector(state => state.content.items);
+  const status = useSelector(state => state.content.status);
+  
+  const [src, setSrc] = useState('');
+
+  useEffect(() => {
+    if (contents.length === 0 && status === 'idle') {
+      dispatch(listarConteudos());
+    } else {
+      let foundUrl = '';
+      for (const content of contents) {
+        if (content.tipo_midia === 'filme' && content._id === id) {
+          foundUrl = content.filme?.url_filme;
+          break;
+        } else if (content.tipo_midia === 'serie' && content.temporadas) {
+          for (const temporada of content.temporadas) {
+            const ep = temporada.episodios?.find(e => e._id === id);
+            if (ep) {
+              foundUrl = ep.url_ep;
+              break;
+            }
+          }
+          if (foundUrl) break;
+        }
+      }
+      
+      // Fallback url se não encontrar (ou para testes se o BD não tiver urls válidas)
+      setSrc(foundUrl || 'https://www.youtube.com/watch?v=C5tn1MvXsLw');
+    }
+  }, [id, contents, status, dispatch]);
 
   return (
     <div className="w-full h-screen bg-black flex items-center justify-center font-sans">
