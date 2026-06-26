@@ -3,11 +3,12 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/getImageUrl";
 
-function Carousel({ imgLink = [] }) {
+function Carousel({ items = [] }) {
 
   const navigate = useNavigate();
-  const carouselSize = imgLink.length;
+  const carouselSize = items.length;
   
   return (
     <div className='w-full'>
@@ -36,17 +37,17 @@ function Carousel({ imgLink = [] }) {
           spaceBetween={10}
           className='rounded-2xl pb-10 custom-swiper'
         >
-          {imgLink.map((link, index) => (
-            <SwiperSlide key={index} className='overflow-visible'>
+          {items.map((item, index) => (
+            <SwiperSlide key={item._id || index} className='overflow-visible'>
               <div className='relative group cursor-pointer' 
-                onClick={() => navigate("/video")}>
+                onClick={() => navigate(`/info/${item._id}`)}>
                 {/* Overlay de gradiente interno para destacar possíveis textos futuros */}
                 <div className='absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
                 
                 <img 
                   className='w-full aspect-video object-cover rounded-2xl border border-white/5 group-hover:border-purple-600/50 shadow-lg group-hover:shadow-purple-600/20 transition-all duration-500' 
-                  src={link} 
-                  alt={`Slide ${index + 1}`} 
+                  src={getImageUrl(item.img_capa)} 
+                  alt={item.titulo || `Slide ${index + 1}`} 
                 />
               </div>
             </SwiperSlide>

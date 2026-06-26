@@ -8,7 +8,7 @@ import { adicionarWishlist } from '../store/userSlice'
 import { listarConteudos } from '../store/contentSlice'
 import { useEffect } from 'react'
 
-function HomePage() {
+function Serie() {
   const dispatch = useDispatch()
   const contents = useSelector(state => state.content.items)
   const status = useSelector(state => state.content.status)
@@ -19,31 +19,32 @@ function HomePage() {
     }
   }, [status, dispatch])
 
+  const series = contents.filter(c => c.tipo_midia === 'serie')
+
   const handleAddWishlist = (id) => {
     dispatch(adicionarWishlist(id))
   }
 
-  
   const sections = [
     {
-      title: "Filmes novos",
-      data: contents.filter(c => c.tipo_midia === 'filme').slice(0, 6)
+      title: "Séries de Anime",
+      data: series.filter(c => c.genero?.includes('Anime')).slice(0, 6)
     },
     {
-      title: "Bombando",
-      data: contents.slice(0, 6)
+      title: "Séries Dramáticas",
+      data: series.filter(c => c.genero?.includes('Drama')).slice(0, 6)
     },
     {
-      title: "Ação",
-      data: contents.filter(c => c.genero?.includes('Ação')).slice(0, 6)
+      title: "Desenhos Animados",
+      data: series.filter(c => c.genero?.includes('Animação')).slice(0, 6)
     },
     {
       title: "Recomendados para você",
-      data: contents.slice(2, 8)
+      data: series.slice(0, 6)
     }
   ]
 
-  const carouselItems = contents.slice(0, 9)
+  const carouselItems = series.slice(0, 9)
 
   return (
     <div className='flex flex-col min-h-screen bg-[#0d1117] relative pb-20'>
@@ -54,15 +55,15 @@ function HomePage() {
       
       <div className='flex-1 relative z-10 px-4 max-w-7xl mx-auto w-full space-y-10 mt-4'>
         
-        {}
+        {/* Destaques */}
         <section>
           <h1 className='text-xl font-semibold text-white/90 mb-4 border-l-4 border-purple-600 pl-3'>
-            Destaques
+            Séries em Destaque
           </h1>
           <Carousel items={carouselItems} />
         </section>
 
-        {}
+        {/* Categorias de Séries */}
         {sections.map((section, index) => (
           <section key={index}>
             <h1 className='text-xl font-semibold text-white/90 mb-4 border-l-4 border-purple-600 pl-3'>
@@ -83,4 +84,4 @@ function HomePage() {
   )
 }
 
-export default HomePage
+export default Serie

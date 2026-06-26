@@ -12,8 +12,10 @@ dist
 dist-ssr
 *.local
 .env
-uploads/**
-!uploads/.gitkeep
+uploads/usuarios/**
+uploads/conteudos/**
+!uploads/usuarios/.gitkeep
+!uploads/conteudos/.gitkeep
 
 # Editor directories and files
 .vscode/*

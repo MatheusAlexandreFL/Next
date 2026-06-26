@@ -18,7 +18,7 @@ class UsuarioController {
 
       if (req.files && req.files.foto) {
         const foto = req.files.foto;
-        const caminho = `uploads/${Date.now()}_${foto.name}`;
+        const caminho = `uploads/usuarios/${Date.now()}_${foto.name}`;
         await foto.mv(caminho);
         imagePath = `/${caminho}`;
       }
@@ -29,18 +29,23 @@ class UsuarioController {
         email,
         senha,
         role: 'user',
-        data_nascimento,
         foto: imagePath
       };
+
+      if (data_nascimento) {
+        userData.data_nascimento = data_nascimento;
+      }
       
       const novoUsuario = await UsuarioService.criarUsuario(userData);
 
       return res.status(201).json({ 
         message: "Usuário criado com sucesso!", 
-        user: novoUsuario 
+        token: novoUsuario.token,
+        usuario: novoUsuario.usuario
+
       });
     } catch (e) {
-      return res.status(500).json({ erro: e.message });
+      return res.status(400).json({ erro: e.message });
     }
   }
 
@@ -63,7 +68,7 @@ class UsuarioController {
       let imagePath = null;
       if (req.files && req.files.foto) {
         const foto = req.files.foto;
-        const caminho = `uploads/${Date.now()}_${foto.name}`;
+        const caminho = `uploads/usuarios/${Date.now()}_${foto.name}`;
         await foto.mv(caminho);
         imagePath = `/${caminho}`;
       }
@@ -124,7 +129,7 @@ class UsuarioController {
   // POST /usuarios/assinar (Lógica de Assinatura)
   // Melhorar a logica de assinatura depois, 
   // talvez um webhook de pagamento, pedir email e nome do usuário para o pagamento, etc
-  async atualizarAssinatura(req, res) {
+  /* async atualizarAssinatura(req, res) {
     try {
       const id = req.params.id;
       const { tipo_plano, tipo_pagamento } = req.body;
@@ -140,6 +145,26 @@ class UsuarioController {
 
       return res.json({ message: "Assinatura ativada!", user: usuarioAtivo });
     } catch (e) {
+      return res.status(400).json({ erro: e.message });
+    }
+  } */
+
+  async atualizarAssinatura(req, res) {
+    try {
+      const id = req.id;
+      const { plano_id, tipo_pagamento } = req.body;
+
+      if (!plano_id || !tipo_pagamento) {
+        throw new Error("Plano e pagamento são obrigatórios.");
+      }
+
+      const usuarioAtivo = await UsuarioService.atualizarAssinatura(id, {
+        plano_id,
+        tipo_pagamento
+      });//o que usuarioAtivo retorna é o usuário atualizado, com a nova assinatura
+
+      return res.json({ message: "Assinatura atualizada!", user: usuarioAtivo });
+    }catch (e) {
       return res.status(400).json({ erro: e.message });
     }
   }

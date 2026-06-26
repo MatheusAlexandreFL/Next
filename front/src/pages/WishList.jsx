@@ -4,6 +4,7 @@ import FooNavBar from '../components/FooNavBar.jsx';
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { buscarWishlist, removerWishlist } from "../store/userSlice";
+import { getImageUrl } from "../utils/getImageUrl";
 function WishList(){
   /*  const myWishlist = [
     { id: 1, title: 'Demon Slayer', imgUrl: 'https://picsum.photos/800/450/?blur?random=1' },
@@ -63,7 +64,7 @@ useEffect(() => {
               {/* IMAGEM */}
               <div className='w-40 md:w-full flex-shrink-0 aspect-video rounded-md overflow-hidden relative'>
                 <img 
-                  src={item.img_capa} 
+                  src={getImageUrl(item.img_capa)} 
                   alt={item.titulo} 
                   className='w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-105' 
                 />

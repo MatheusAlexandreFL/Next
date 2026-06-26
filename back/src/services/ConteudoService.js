@@ -35,9 +35,9 @@ class ConteudoService {
   const serieAtualizada = await Conteudo.findById(serieId);
   const tempAtualizada = serieAtualizada.temporadas.find(t => t.numero === numeroTemporada);
   
-  const existeEpisodio = tempAtualizada.episodios.find(ep => ep.titulo === dadosEpisodio.titulo);
+  const existeEpisodio = tempAtualizada.episodios.find(ep => ep.titulo === dadosEpisodio.titulo || ep.numero === dadosEpisodio.numero);
   if (existeEpisodio) {
-    throw new Error(`O episódio "${dadosEpisodio.titulo}" já foi cadastrado na Temporada ${numeroTemporada}.`);
+    throw new Error(`O episódio com título "${dadosEpisodio.titulo}" ou número ${dadosEpisodio.numero} já foi cadastrado na Temporada ${numeroTemporada}.`);
   }
 
   const resultado = await Conteudo.findOneAndUpdate(
@@ -69,6 +69,40 @@ class ConteudoService {
       throw new Error("Série ou temporada não encontrada.");
     }
     return deletado;
+  }
+
+  // Atualizar Conteúdo
+  async atualizarConteudo(id, dados) {
+    const atualizado = await Conteudo.findByIdAndUpdate(id, dados, { new: true });
+    if (!atualizado) {
+      throw new Error("Conteúdo não encontrado.");
+    }
+    return atualizado;
+  }
+
+  // Atualizar Episódio
+  async atualizarEpisodio(serieId, numeroTemporada, episodioId, dados) {
+    const query = { _id: serieId, "temporadas.numero": numeroTemporada, "temporadas.episodios._id": episodioId };
+    
+    // Preparar objeto de $set para o episódio aninhado
+    const setObj = {};
+    for (const key in dados) {
+      setObj[`temporadas.$[temp].episodios.$[ep].${key}`] = dados[key];
+    }
+
+    const atualizado = await Conteudo.findOneAndUpdate(
+      query,
+      { $set: setObj },
+      { 
+        new: true,
+        arrayFilters: [{ "temp.numero": numeroTemporada }, { "ep._id": episodioId }]
+      }
+    );
+
+    if (!atualizado) {
+      throw new Error("Série, temporada ou episódio não encontrados.");
+    }
+    return atualizado;
   }
 }
 

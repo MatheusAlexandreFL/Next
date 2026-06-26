@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
 const EpisodioSchema = new mongoose.Schema({
+  numero: { type: Number, required: true },
   titulo: { type: String, required: true },
   img_ep: String,
-  url_ep: { type: String, required: true }
+  url_ep: { type: String, required: true },
+  descricao: String
 });
 
 const ConteudoSchema = new mongoose.Schema({
